@@ -89,4 +89,9 @@ ArrayList 删除元素的时候，有两种方式，一种是直接删除元素�
 LinkedList
 先检查索引，再调用 node(int) 方法（ 前后半段遍历，和新增元素操作一样）找到节点 Node，然后调用 unlink(Node) 解除节点的前后引用，同时更新前节点的后引用和后节点的前引用：
 
-#### 
+#### ArrayList 和 LinkedList 遍历元素时究竟谁快
+
+由于 ArrayList 是由数组实现的，所以根据索引找元素非常的快，一步到位。
+
+LinkedList 使用 for 循环遍历时效率极低，因为每一个get 操作都需要又遍历一次半个链表。
+而用 foreach 或迭代器遍历是使用 链表元素的 next 指针遍历。
