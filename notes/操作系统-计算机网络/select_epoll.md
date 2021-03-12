@@ -1,5 +1,5 @@
 ## 工作流程
-![select-epoll.png](../../img/OSandNets/select-epoll.png)
+![select-epoll.png](https://github.com/Francis-Tmac/my_notes/blob/main/img/OSandNets/select-epoll.png)
 
 ## epoll 函数
 
@@ -52,3 +52,13 @@ ep_poll_callback将相应fd对应epitem加入rdlist，导致rdlist不空，进�
 工作模式 | LT | LT | 支持ET高效模式
 内核实现和工作效率 | 采用轮询方式检测就绪事件，时间复杂度：O(n) | 采用轮询方式检测就绪事件，时间复杂度：O(n) | 采用回调方式检测就绪事件，时间复杂度：O(1)
 
+
+
+需要注意的是：epoll并不是在所有的应用场景都会比select和poll高很多。尤其是当活动连接比较多的时候，回调函数被触发得过于频繁的时候，epoll的效率也会受到显著影响！所以，epoll特别适用于连接数量多，但活动连接较少的情况。
+
+
+参考：
+
+[I/O多路转接之epoll](https://blog.csdn.net/qq_34992845/article/details/76407367)
+
+[Epoll详解](https://blog.csdn.net/yangguosb/article/details/80403432)
