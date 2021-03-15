@@ -36,6 +36,32 @@ end
 - 这个规则引擎还存在什么问题，怎么去优化
 - 在项目中有遇到什么难点，怎么解决的
 
+对环是如何处理的：深度遍历一遍图将遍历过的节点存在 set 中，每次校验是否已存在 set。
+Map<string,List<String> children>  pathList string
+
+``` 
+ private void doCheckCircle(LinkedHashMap<String, ArrayList<String>> selfChildrenMap, ArrayList<String> pathList, String self){
+        ArrayList<String> children = selfChildrenMap.get(self);
+        if(CollectionUtils.isEmpty(children)){
+            return;
+        }
+
+        if(pathList.contains(self)){
+            pathList.add(self);
+            throw new InternalException(ErrorBaseEnum.EXCEPTION, "步骤之间的依赖不能形成环|pathList:{}|circleStep:{}", StringUtils.join(pathList, "->"), self);
+        }
+        pathList.add(self);
+
+        /******************************************************************
+         * 深度遍历校验
+         *****************************************************************/
+        for (String child : children) {
+            this.doCheckCircle(selfChildrenMap, new ArrayList<>(pathList), child);
+        }
+    }
+```
+
+
 说到接口降级的功能
 现有的功能是直接拒绝掉
 让我想想通过队列去做回调有可能出现的问题
@@ -60,3 +86,28 @@ end
 
 
 规则引擎： 风控，推荐，
+
+批任务处理时在入口外就会拉取了大量的数据造成了超时
+
+任务监控系统，监控系统的告警，目前有什么问题。
+1. 不能影响正常的任务执行，不允许抛出任何异常。
+
+
+用户提前结清 + 正常还款
+
+还款试算的场景，上游提前对正常还款批任务处理的场景进行试算缓存，大量的瞬时流量请求到系统中。
+1. 优化点上游提前对批扣场景进行分片处理
+2. 对还款计划做缓存，一天只查询一次资金方接口。
+
+如果用削峰加回调的模式可能会出现什么问题：
+1. 消息丢失
+2. 失败策略怎么处理，如果一直是失败怎么处理，设置封装成一个dto后设置一个ttl ，再放到告警队列中告警处理。
+3. 夸天消息不能消费，十一点半清空队列。 
+4. mq 的消费策略是怎么样的，是不是先进先出，如果不是有可能存在一直没有被消费的消息
+5. 如何判断什么时候可以去消费mq, 当设置有最大值时不去消费渠道的消息
+6  把两个流量入口合并成一个并封装其请求设置ttl ,每次调用后-1，为0时放到告警队列。
+
+
+
+
+
