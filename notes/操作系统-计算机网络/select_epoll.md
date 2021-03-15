@@ -1,5 +1,5 @@
 ## 工作流程
-![select-epoll.png](../../img/OSandNets/select-epoll.png)
+![select-epoll.png](../../img/OSAndNets/select-epoll.png)
 
 ## epoll 函数
 
