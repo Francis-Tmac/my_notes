@@ -49,4 +49,44 @@
 1. 建表以后的新加的时间字段没有建索引，少数资方使用到，导致慢查询
 2. channel 索引删除与 createTime 做联合索引
 3. 区分度高的 status 与 proc 联合索引，运营系统需要对正在处理中的订单进行监控。
-4. 
+
+资金接入组，负责开发维护整个公司的资金端，为公司的资产提供匹配到的资金。
+背景：我们组需要为资产和匹配好的资金方做流程对接
+难点：不同资金方的对接流程和传输报文字段加解密方式都各不相同。各自开发资金对接系统时间成本大。
+如何解决：抽象对接流程，标准化数据源。
+
+解决后：快速的配置化流程两到三天开发完成一个资金方的对接流程。
+
+
+```
+ /**
+     * lua 脚本原文
+     */
+    private static final String LUA_SCRIPT =
+                    "local maxRequestKey = KEYS[1] " +
+                    "local curRequestKey = KEYS[2] " +
+                    "local lowestRequestCount = ARGV[1] " +
+                    "local reqId = ARGV[2] " +
+                    "local timstampVal = ARGV[3] " +
+                    "local result = 0 " +
+                    "local maxCount = redis.call('get', maxRequestKey) " +
+                    "if maxCount " +
+                    "then " +
+                    "    local curCount = redis.call('hkeys', curRequestKey) " +
+                    "    if(tonumber(maxCount) >= tonumber(lowestRequestCount) and #curCount >= tonumber(maxCount)) " +
+                    "    then " +
+                    "        return 0 " +
+                    "    end " +
+                    "    redis.call('hset', curRequestKey, reqId, timstampVal) " +
+                    "    return 1 " +
+                    "else " +
+                    "    redis.call('hset', curRequestKey, reqId, timstampVal) " +
+                    "    return 1 " +
+                    "end ";
+    String maxRequestKey = genRedisKey(channelCode, interfaceName, MAX_REQUEST_SUFFIX);
+    String currentRequestKey = genRedisKey(channelCode, interfaceName, CURRENT_REQUEST_SUFFIX);
+    
+    List<String> keys = Lists.newArrayList(maxRequestKey, currentRequestKey);               
+    Long code = this.runLua(LUA_SCRIPT, Long.class, keys, Long.toString(lowestRequestCount), reqId, Long.toString(System.currentTimeMillis() / 1000));
+
+```
