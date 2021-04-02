@@ -1,3 +1,12 @@
 # Created by .ignore support plugin (hsz.mobi)
 
 
+将删除 .idea/$CACHE_FILE$
+将删除 .idea/.gitignore
+将删除 .idea/codeStyles/
+将删除 .idea/compiler.xml
+将删除 .idea/inspectionProfiles/
+将删除 .idea/misc.xml
+将删除 .idea/modules.xml
+将删除 .idea/my_notes.iml
+将删除 .idea/vcs.xml
