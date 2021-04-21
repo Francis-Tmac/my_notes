@@ -54,6 +54,8 @@ Swap:             0           0           0
 21585 user_00    20   0 1523M 32748  5452 S  1.8  0.4     126h /home/server/service_mesh_slave/bin/service_mesh_slave
 16090 user_00    20   0  179M 55440  3248 S  1.8  0.7     142h bin/m_agent -c conf/agent.json
 ```
-
+#### 
+request 
+140w / day 上游透传查询
 
 
