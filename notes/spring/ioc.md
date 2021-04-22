@@ -128,6 +128,16 @@ singletonFactories |	用于存放 bean 工厂。bean 工厂所产生的 bean 是
 可以用二级缓存实现
 三级缓存，责任明确 性能更好，第三级缓存 是函数接口，主要用来解决aop
 
+缓存 |	用途
+--- | --- 
+singletonObjects | 	用于存放完全初始化好的 bean，从该缓存中取出的 bean 可以直接使用
+earlySingletonObjects |	用于存放还在初始化中的 bean，用于解决循环依赖
+singletonFactories |	用于存放 bean 工厂。bean 工厂所产生的 bean 是还未完成初始化的 bean。如代码所示，bean 工厂所生成的对象最终会被缓存到 earlySingletonObjects 中
+
+
+
+
+
 BeanFactoryPostProcessor -----> 修改 Bean定义
 BeanDefinitionRegistryPostProcessor -----> 注册Bean定义
 
