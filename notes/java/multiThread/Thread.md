@@ -86,7 +86,7 @@ public class Mutex {
         }  
     }  
   
-    public static void main(String\[\] args) {  
+    public static void main(String[] args) {  
         final Mutex mutex = new Mutex();  
  for (int i = 0; i < 5; i++) {  
             new Thread(mutex::accessResource).start();  
@@ -193,11 +193,12 @@ Found 1 deadlock.
 
 ## ThreadGroup 
 
-!\[threadGroup](../../../img/java/threadGroup.jpg)
+![threadGroup ](../../../img/java/threadGroup.jpg)
 
 
 
-
+## 线程池原理
+线程是一个重量级的资源，创建，启动一级销毁都是比较耗费系统资源的。线程数量和系统性能是一种抛物线关系。
 
 
 
