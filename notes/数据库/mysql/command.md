@@ -41,5 +41,49 @@ MySQL [fund_hub]> show index from t_example;
 
 ```
 
+### 存储过程
+```sql
+// 定义分隔符为 ';;' 号, 默认情况下分隔符为 ';'
+delimiter ;;
+create procedure idata()
+begin
+  declare i int;
+  set i=1;
+  while(i<=100000)do
+    insert into t values(i, i, i);
+    set i=i+1;
+  end while;
+end;;
+delimiter ;
+call idata();
 
+```
+
+### 慢查询日志
+``` sql
+mysql> show variables like 'slow_query%';
++---------------------+-----------------------------------------+
+| Variable_name       | Value                                   |
++---------------------+-----------------------------------------+
+| slow_query_log      | ON                                      |
+| slow_query_log_file | /usr/local/var/mysql/XYSZSX066-slow.log |
++---------------------+-----------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> show variables like 'long_query_time';
++-----------------+----------+
+| Variable_name   | Value    |
++-----------------+----------+
+| long_query_time | 2.000000 |
++-----------------+----------+
+1 row in set (0.00 sec)
+```
+
+``` sql
+# Time: 2021-04-23T02:53:44.566996Z
+# User@Host: skip-grants user[root] @ localhost []  Id:    15
+# Query_time: 0.013812  Lock_time: 0.000137 Rows_sent: 10001  Rows_examined: 10001
+SET timestamp=1619146424;
+select * from t_test_3 where a between 10000 and 20000;
+```
 

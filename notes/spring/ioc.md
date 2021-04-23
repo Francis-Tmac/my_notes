@@ -129,7 +129,7 @@ singletonFactories |	用于存放 bean 工厂。bean 工厂所产生的 bean 是
 三级缓存，责任明确 性能更好，第三级缓存 是函数接口，主要用来解决aop
 
 缓存 |	用途
---- | --- 
+:---: | :--- 
 singletonObjects | 	用于存放完全初始化好的 bean，从该缓存中取出的 bean 可以直接使用
 earlySingletonObjects |	用于存放还在初始化中的 bean，用于解决循环依赖
 singletonFactories |	用于存放 bean 工厂。bean 工厂所产生的 bean 是还未完成初始化的 bean。如代码所示，bean 工厂所生成的对象最终会被缓存到 earlySingletonObjects 中
@@ -198,5 +198,4 @@ aop: 面向界面编程，遇到很多重复性的代码，比如日志，事务
 spring中的IOC 容器用来存储所有的bean 对象，它管理了这些bean从实例化 初始化 到销毁的整个生命周期。
 spring 在讲类初始化为一个bean 对象的过程中，需要先将原对象的信息装换为一个 beanDefinition ,完成了整个beanDefinition的解析和加载过程后。
 通过beanDefinition 的信息用反射方式对bean进行创建操作，
-
 
