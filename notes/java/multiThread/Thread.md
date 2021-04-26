@@ -199,13 +199,68 @@ Found 1 deadlock.
 
 ## 线程池原理
 线程是一个重量级的资源，创建，启动一级销毁都是比较耗费系统资源的。线程数量和系统性能是一种抛物线关系。
+- 任务队列：用于缓存提交的任务
+- 线程数量管理功能：
+    - 初始线程数量 init
+    - 最大线程数量 core
+    - 核心线程数量 max
+    - init  ≤ core ≤ max
+-  任务拒绝策略：如果线程数量达到 上线且任务队列已满，则需要有拒绝 策略通知任务提交者
+- 线程工厂：定制化线程，设置守护线程，线程名称等
+- QueueSize: 任务队列主要存放提交的 Runnable
+- keepedalive: 决定线程
+
+- `ThreadPoolExecutor#runWorker(Worker w)`
+    - 此方法中有一个循环，在其内部会获取任务执行，若获取不到会阻塞或者获取超时会放回。
+    - `getTask()---> `
+```  java
+private Runnable getTask() {
+    Runnable r = timed ?  
+    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :  
+    workQueue.take();
+}
 
 
+final void runWorker(Worker w) {
+    while (task != null || (task = getTask()) != null) {
+        w.lock;
+        task.run();
+    }
+}
+```
 
 
+- `ThreadPoolExecutor#addWorker(Runnable firstTask, boolean core)`
+    - 先进行容量判断后在新建 线程
+```java
+private boolean addWorker(Runnable firstTask, boolean core) {
+    w = new Worker(firstTask);
+    final Thread t = w.thread;
+    if (rs < SHUTDOWN ||  
+    (rs == SHUTDOWN && firstTask == null)) {  
+    if (t.isAlive()) // precheck that t is startable  
+  throw new IllegalThreadStateException();  
+  workers.add(w);  
+ int s = workers.size();  
+ if (s > largestPoolSize)  
+        largestPoolSize = s;  
+  workerAdded = true;  
+}
+}
 
+```
 
+```java
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+private static int ctlOf(int rs, int wc) { return rs | wc; }
 
+```
+
+AtomicInteger类型的ctl代表了ThreadPoolExecutor中的控制状态，它是一个复核类型的成员变量，是一个原子整数，借助高低位包装了两个概念：
+
+        （1）workerCount：线程池中当前活动的线程数量，占据ctl的低29位；
+
+        （2）runState：线程池运行状态，占据ctl的高3位，有RUNNING、SHUTDOWN、STOP、TIDYING、TERMINATED五种状态
 
 
 
