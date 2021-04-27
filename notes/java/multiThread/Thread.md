@@ -29,7 +29,8 @@
 #### start 方法
 - Thread 被构造后的new 装填，ThreadStatus 这个内部属性为0。
 - 不能两次启动Thread， 否则就会出现 IllegalThreadStateException 异常。
-- 线程启动后就会被假如到一个 ThreadGroup 中。
+- 线程启动后就会被加入到一个 ThreadGroup 中。
+- 一个线程周期结束，到了terminated 状态，再次调用start 方法是不允许的
 - Thread 负责线程本身相关的职责和控制，Runnable 则负责逻辑执行单元的部分。
 
 #### 线程的父子关系
@@ -138,6 +139,7 @@ public class Mutex {
 - 交叉锁引起的死锁
     - 交叉锁引起的死锁线程都会进入 BLOCKED 状态，CPU 资源占用不高，很容易借助工具发现
     - jstack -l pid
+    - 死锁：循环等待资源的情况
 ```bash
  frank@XYSZSX066  ~  jstack -l 93269 | grep -A 20  deadlock
 Found one Java-level deadlock:
@@ -185,6 +187,7 @@ Found 1 deadlock.
 - 线程执行某个对象的wait 方法后，会假如到对应的 wai set 中，没有对象的monitor 都有一个与之关联的 wait set 
 
 ### wait 和 sleep 
+- 结合线程的五种状态和是否在同步方法中执行分析
 - 都可以是线程进入阻塞状态
 - 都是可中断方法
 - wait 是object 的方法，sleep 是Thread 特有的方法
@@ -210,20 +213,15 @@ Found 1 deadlock.
 - QueueSize: 任务队列主要存放提交的 Runnable
 - keepedalive: 决定线程
 
+## ThreadPoolExecutor
 ###  runWorker
 - `ThreadPoolExecutor#runWorker(Worker w)`
+    - runWorker 在 Worker 中的 run 方法中被调用，而 runWorker 方法中会循环调用 task 的run 方法
     - 此方法中有一个循环，在其内部会获取任务执行，若获取不到会阻塞或者获取超时会放回。
     - `getTask()---> `
 ```  java
 public class ThreadPoolExecutor extends AbstractExecutorService {
     
-    private Runnable getTask() {
-        Runnable r = timed ?  
-        workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :  
-        workQueue.take();
-    }
-
-
     final void runWorker(Worker w) {
         Thread wt = Thread.currentThread();  
         Runnable task = w.firstTask;  
@@ -387,20 +385,20 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             return false;  
          // 用循环CAS操作来将线程数加1
          for (;;) {  
-            int wc = workerCountOf(c);  
-         // core = true 是添加核心线程，false 为添加最大线程
-         // 线程超标则返回
-         if (wc >= CAPACITY ||  
-                wc >= (core ? corePoolSize : maximumPoolSize))  
-                return false;  
-         // 添加成功退出循环
-         if (compareAndIncrementWorkerCount(c))  
-                break retry;  
-          c = ctl.get(); // Re-read ctl  
-          // 如果线程池的状态发生变化 返回到 retry 外层循环
-          if (runStateOf(c) != rs)  
-                continue retry;  
-          // else CAS failed due to workerCount change; retry inner loop  
+             int wc = workerCountOf(c);  
+             // core = true 是添加核心线程，false 为添加最大线程
+             // 线程超标则返回
+             if (wc >= CAPACITY ||  
+                    wc >= (core ? corePoolSize : maximumPoolSize))  
+                    return false;  
+             // 添加成功退出循环
+             if (compareAndIncrementWorkerCount(c))  
+                    break retry;  
+              c = ctl.get(); // Re-read ctl  
+              // 如果线程池的状态发生变化 返回到 retry 外层循环
+              if (runStateOf(c) != rs)  
+                    continue retry;  
+              // else CAS failed due to workerCount change; retry inner loop  
           }  
         }  
      
