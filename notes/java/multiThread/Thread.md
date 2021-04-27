@@ -446,11 +446,19 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
 ```
 
+###  Worker
+worker 类继承了 AQS 
+
 ### question
 - 是否所有的任务都会放到任务队列中，线程池中的队列总任务队列中消费队列。
     - 不是当正在执行线程小于核心线程数时，新提交的任务会直接有新创建的线程执行
-
-
-
-
-
+- 守护线程和用户线程的区别
+    - 守护线程通过 `Thread.setDaemon(true)` 设置，必须在 `Thread.start()` 之前调用
+    - 唯一的区别是判断虚拟机(JVM)何时离开，Daemon 是为其他线程提供服务，如果 全部的 User Thread 已经撤离，Daemon 没有可服务的线程，JVM 撤离。
+    - JVM 的垃圾回收线程是一个守护线程，当所有线程已经撤离，不在产生垃圾，JVM 自然会关闭
+- 什么是阻塞队列？ 实现原理是什么？
+    - 阻塞队列(BlockingQueue)是一个支持两个附加操作的队列。
+    - 在队列为空时，获取元素的线程会等待队列变为非空。
+    - 当队列满时，存储元素的线程会等待队列可用。
+    - put方法 take方法 阻塞方法， offer 和 poll 是带时间的阻塞方法。
+    - ArrayBlockingQueue 内部维护两个 `Condition notEmpty,notFull` 当 调用 `take` 方法队列为空时调用 `notEmpty.await()` 阻塞线程，在有线程向队列中添加任务后会调用 `notEmpty.signal` 唤醒线程去获取任务。
