@@ -260,3 +260,8 @@ worker 类继承了 AQS
     - 当队列满时，存储元素的线程会等待队列可用。
     - put方法 take方法 阻塞方法， offer 和 poll 是带时间的阻塞方法。
     - ArrayBlockingQueue 内部维护两个 `Condition notEmpty,notFull` 当 调用 `take` 方法队列为空时调用 `notEmpty.await()` 阻塞线程，在有线程向队列中添加任务后会调用 `notEmpty.signal` 唤醒线程去获取任务。
+
+
+## reactor
+与线程池不同的是每一个队列都有一个任务队列，并且不是阻塞的。
+reactor 中的线程有两种定义一种处理IO事件。

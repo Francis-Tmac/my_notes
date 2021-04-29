@@ -150,8 +150,156 @@ public class ActiveLoadTest {
     5. 运行时生成class 文件，并且动态加载。
 
 #### 连接阶段
-- 验证
-- 
+#####  验证
+- 第一阶段文件格式验证：验证字节码是否符合Class 文件格式的规范
+- 第二阶段元数据验证：对字节码描述的信息进行语义分析，以确保符合 《Java 语言规范》
+    - 是否有父类除了 Object 之外，所有的类都应当有父类。
+    - 这个类的父类是否继承了不允许被继承的类（final)。
+    - 如果这个类不是抽象类是否实现了所有父类或接口中要求实现的所有方法。
+- 第三阶段字节码验证：这个阶段是对类的方法体（Class 文件中的Code 属性）进行校验分析，保证被校验类中的方法在运行时不会做出危害虚拟机安全的行为，例如：
+    - 在操作栈放置了一个 int 类型的数据，使用时却按long 类型假如本地变量表中
+    - 一个子类可以复制给父类数据类型，这是安全的，但是把父类对象赋值给子类数据类型，是不合法的。
+- 第四阶段符号引用验证：最后一个阶段发生在虚拟机将符号引用转换为直接引用的时候，也就是连接的第三阶段（解析阶段），符号引用可以看作是对类自身以外（常量池中的各种符号引用）的各类信息进行匹配性校验，通俗来说就是，该类是否缺少或者被禁止访问他依赖的某些外部类，方法，字段等资源。
+    - 符号引用中通过字符串描述的全限定名是否能找到对应的类。
+    - 在指定类中是否存在符合方法的字段描述以及简单名称锁描述的方法和字段。
+    - 符号引用中的类，字段，方法的可访问性是否可被当前类访问。
+- -Xverify:none 可以关闭大部分的类验证措施，以缩短虚拟机类加载的时间
+
+
+##### 准备
+- 通过验证过程后，开始为类变量也就是静态变量，分配内存并且设置初始值，类变量的内存会被分配到方法区中。在JDK7 后，类变量会随着Class 对象一起存放在 Java 堆中。
+- 真正对类变量赋值的 putstatic 指令是在程序被编译后，存放于类构造器 `<clinit>()` 方法中，所以把 child 赋值为 `new Child()` 的动作要到类的初始化阶段才能被执行
+
+```
+// access flags 0x8
+  static <clinit>()V
+   L0
+    LINENUMBER 11 L0
+    NEW com/frank/multihread/thread/Child
+    DUP
+    INVOKESPECIAL com/frank/multihread/thread/Child.<init> ()V
+    PUTSTATIC com/frank/multihread/thread/ActiveLoadTest.child : Lcom/frank/multihread/thread/Child;
+    RETURN
+    MAXSTACK = 2
+    MAXLOCALS = 0
+```
+- 有 final 修饰的静态变量不会导致类的初始化，是一种被动引用。常量在编译阶段 javac 会将其value 生成一个 constantValue 属性，直接赋值。
+
+
+##### 解析
+- 符号引用：以一组符号来描述锁引用的目标，符号可以是任务形式的字面量，只要使用是能够无歧义的定位到目标即可。引用的目标不一定是已经加载到虚拟机内存当中的内容。
+- 直接引用：直接指向目标的指针，相对偏移量。如果有了直接引用，那引用目标必定已经存在虚拟机的内存中。
+- 解析就是在常量池中寻找类，接口，字段和方法的符号引用，并且为这些符号引用替换成直接引用的过程。
+```java
+public class ActiveLoadTest {  
+     static Child child = new Child();  
+     public static void main(String[] args) {  
+        System.out.println(child);  
+      }  
+}
+
+```
+上面代码中用到 Child 类，在编写程序的时候可以直接使用这个 child 引用去访问 Child 类中可见的属性和方法，但是在 class 字节码中它会被编译成相应的助记符，这些助记符被称为符号引用，在类解析过程中，助记符还需要得到进一步的解析，才能正确地找到所对应的堆内存中的 Child 数据结构，
+字节码信息
+``` 
+public class com/frank/multihread/thread/ActiveLoadTest {
+
+  // compiled from: ActiveLoadTest.java
+
+  // access flags 0x8
+  static Lcom/frank/multihread/thread/Child; child
+
+  // access flags 0x1
+  public <init>()V
+   L0
+    LINENUMBER 10 L0
+    ALOAD 0
+    INVOKESPECIAL java/lang/Object.<init> ()V
+    RETURN
+   L1
+    LOCALVARIABLE this Lcom/frank/multihread/thread/ActiveLoadTest; L0 L1 0
+    MAXSTACK = 1
+    MAXLOCALS = 1
+
+  // access flags 0x9
+  public static main([Ljava/lang/String;)V
+   L0
+    LINENUMBER 13 L0
+    // 在常量池中通过 getstatic 指令获取PrintStream
+    GETSTATIC java/lang/System.out : Ljava/io/PrintStream;
+    // 同样也适用于获取Child
+    // 在字节码的执行过程中， getstatic 被执行之前，就需要进行解析。
+    GETSTATIC com/frank/multihread/thread/ActiveLoadTest.child : Lcom/frank/multihread/thread/Child;
+    // 然后通过 invokespecial 指令 将 child 传递给 PrintStream.println 方法。
+    INVOKEVIRTUAL java/io/PrintStream.println (Ljava/lang/Object;)V
+   L1
+    LINENUMBER 14 L1
+    RETURN
+   L2
+    LOCALVARIABLE args [Ljava/lang/String; L0 L2 0
+    MAXSTACK = 2
+    MAXLOCALS = 1
+
+  // access flags 0x8
+  static <clinit>()V
+   L0
+    LINENUMBER 11 L0
+    NEW com/frank/multihread/thread/Child
+    DUP
+    INVOKESPECIAL com/frank/multihread/thread/Child.<init> ()V
+    PUTSTATIC com/frank/multihread/thread/ActiveLoadTest.child : Lcom/frank/multihread/thread/Child;
+    RETURN
+    MAXSTACK = 2
+    MAXLOCALS = 0
+}
+
+
+```
+解析过程主要正对类接口，字段，类方法和接口方法这四类
+- 类接口的解析
+- 字段的解析
+    - 就是访问的类或者接口中的字段，在 解析 类或者变量的时候，如果改字段不存在或者出现错误就会抛出异常。
+    - 如果 Child 类本身存在这个字段，这直接返回字段的引用，当然也要对改字段所属的类提前进行类加载。
+    - 如果 Child 类中 不存在改字段，则会根据继承关系自下而上，查找父类或者接口字段，找到即可返回，童谣需要提前对找到的字段进行类加载过程。
+    - 如果一直找到 Object 还是没有，这标识查询失败，抛出异常。
+
+#### 初始化
+- 最主要的就是执行 `<clinit>()` 方法 （class initialize ），`<clinit>()` 方法中所有的类变量都会被赋予正确的值，也就是编写的时候指定的值。
+-  `<clinit>()` 方法在编译器生成，`<clinit>()` 与类的构造函数不同，不需要显示调度父类的构造器，虚拟机会保证父类的 `<clinit>()`  最先执行
+- `<clinit>()` 方法虽然是真实存在的，但是它只能被虚拟机执行，在主动触发了类的初始化之后会调用这个方法。
+
+
+***
+## 类加载器
+对于任意一个 `class` 都需要有加载他的类加载器和这个类本身确立在 JVM 中的唯一性，也就是运行时包。
+- 根加载器
+- 扩展类加载器
+
+- 双亲委派模型
+- 破坏双亲委派模型
+    - 热部署：不停止服务下增加新功能。
+
+- 类 加载器命名空间
+    - 同一个class 实例在同一个类加载器命名空间之下是唯一的。
+- 运行时包是有类加载器的命名空间和类的全限定名称共同组成的。
+- `VM options: -verbose:class` 打印加载的class 
+
+## 线程上下文类加载器
+为什么要有线程上下文加载器呢？这与JVM类加载器双亲委托机制自身的缺陷分不开。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
