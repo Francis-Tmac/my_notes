@@ -62,6 +62,16 @@ Swap:             0           0           0
 53个接口
 总调用量 700w - 1kw
 
+### 吞吐量
+   - 190：
+       - 运行时长100分钟，GCT 107s = 98.25%
 
-
-
+```
+[user_00@VM-0-3-centos ~]$ jstat -gcutil 30151
+  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT
+  0.00  91.75  53.70  65.77  93.01  89.98   7391  101.083    16    6.142  107.225
+  
+[user_00@VM-121-190-centos ~]$ ps aux |grep 'api_center'
+user_00   9599  0.0  0.0 112812   976 pts/0    S+   19:48   0:00 grep --color=auto api_center
+user_00  30151 37.4 22.6 7116032 1815424 ?     Sl   15:31  96:01 java -Denv=PRO -server -Xms1024m -Xmx1024m -Xmn192m -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
+```

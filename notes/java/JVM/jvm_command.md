@@ -116,7 +116,8 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.181-b13, mixed mode)
 * **FGCT：**老年代垃圾回收消耗时间
 * **GCT：**垃圾回收消耗总时间
 
+[jstat命令查看jvm的GC情况](https://www.cnblogs.com/yjd_hycf_space/p/7755633.html)
 
-
+*** 
 
 

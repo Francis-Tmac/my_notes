@@ -1,0 +1,5 @@
+- 安装 arthas: `curl -O https://arthas.aliyun.com/arthas-boot.jar`
+- 启动 arthas：`java -jar arthas-boot.jar`
+- 再次进入 arthas: `telnet 127.0.0.1 3658`
+- 退出并关闭 arthas: `stop`
+- 面板
