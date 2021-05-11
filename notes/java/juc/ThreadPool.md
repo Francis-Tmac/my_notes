@@ -84,6 +84,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             int wc = workerCountOf(c);  
   
             // Are workers subject to culling?  
+            // 如果为false（默认），则即使处于空闲状态，核心线程也保持活动状态。
+            // 如果为true，则核心线程使用keepAliveTime来超时等待工作。
             boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;  
   
            if ((wc > maximumPoolSize || (timed && timedOut))  
@@ -95,7 +97,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
   
            try {  
                 // poll() 非阻塞方法，超过keepAliveTime 则返回空
-                // 因为线程处理完任务会持续调用 getTask方法，当 timed= wc > corePoolSize 时，会使用keepAliveTime 进行有效时长获取任务。
+                // 因为线程处理完任务会持续调用 getTask方法，当 timed= wc > corePoolSize 时，会使用 keepAliveTime 进行有效时长获取任务。
+                // 如果在keepAliveTime时间内没有获取到任务，此 worker 将会推出while 循环，进入 finally 中减少线程
                 // 当timed =  false  时调用阻塞方法，持续获取任务
                 // tips: 当线程数量达到 coreSize 后，并且allowCoreThreadTimeOut = false ,是否后续线程池的大小不会低于 coreSize
                 Runnable r = timed ?  
@@ -109,8 +112,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
            }
         }
     }
-    
-    
 }
 ```
 
@@ -156,7 +157,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          int recheck = ctl.get();  
          // 如果当前线程状态不是 running ，并且能从队列移除 command 成功
          // 拒绝任务
-         if (! isRunning(recheck) && remove(command))  
+         if (!isRunning(recheck) && remove(command))  
             reject(command);  
          // 当工作线程worker 数目为0 时，尝试添加新的 worker 线程，但是不携带任务
          // 当 ctl 为0 是意味着 线程池状态为 shutDown，并且工作线程数量为 0
@@ -249,7 +250,7 @@ worker 类继承了 AQS
 
 ### question
 - 是否所有的任务都会放到任务队列中，线程池中的队列总任务队列中消费队列。
-    - 不是当正在执行线程小于核心线程数时，新提交的任务会直接有新创建的线程执行
+    - 不是，当正在执行线程小于核心线程数时，新提交的任务会直接有新创建的线程执行
 - 守护线程和用户线程的区别
     - 守护线程通过 `Thread.setDaemon(true)` 设置，必须在 `Thread.start()` 之前调用
     - 唯一的区别是判断虚拟机(JVM)何时离开，Daemon 是为其他线程提供服务，如果 全部的 User Thread 已经撤离，Daemon 没有可服务的线程，JVM 撤离。

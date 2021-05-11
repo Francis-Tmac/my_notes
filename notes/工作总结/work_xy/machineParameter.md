@@ -75,3 +75,213 @@ Swap:             0           0           0
 user_00   9599  0.0  0.0 112812   976 pts/0    S+   19:48   0:00 grep --color=auto api_center
 user_00  30151 37.4 22.6 7116032 1815424 ?     Sl   15:31  96:01 java -Denv=PRO -server -Xms1024m -Xmx1024m -Xmn192m -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
 ```
+### 机器CPU
+- prod 一个CPU （physical id）四核（cpu cores）四线程（processor）
+删除部分多余信息，最后一个保留
+```
+[user_00@VM_0_3_centos ~]$ cat /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Xeon(R) Gold 61xx CPU
+stepping	: 3
+microcode	: 0x1
+cpu MHz		: 2394.364
+cache size	: 4096 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 4
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Xeon(R) Gold 61xx CPU
+stepping	: 3
+microcode	: 0x1
+cpu MHz		: 2394.364
+cache size	: 4096 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 4
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Xeon(R) Gold 61xx CPU
+stepping	: 3
+microcode	: 0x1
+cpu MHz		: 2394.364
+cache size	: 4096 KB
+physical id	: 0
+siblings	: 4
+core id		: 2
+cpu cores	: 4
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Xeon(R) Gold 61xx CPU
+stepping	: 3
+microcode	: 0x1
+cpu MHz		: 2394.364
+cache size	: 4096 KB
+physical id	: 0
+siblings	: 4
+core id		: 3
+cpu cores	: 4
+apicid		: 3
+initial apicid	: 3
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl eagerfpu pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch fsgsbase bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx avx512f avx512dq rdseed adx smap avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 arat
+bogomips	: 4788.72
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 46 bits physical, 48 bits virtual
+power management:
+
+
+```
+- fat 八核 八线程
+```
+[user_00@VM-77-37-centos /home/log/ams.asset_manager.asset_distribute]$ cat /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 4
+apicid		: 0
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 4
+apicid		: 1
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 0
+siblings	: 4
+core id		: 2
+cpu cores	: 4
+apicid		: 2
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 0
+siblings	: 4
+core id		: 3
+cpu cores	: 4
+apicid		: 3
+
+processor	: 4
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 1
+siblings	: 4
+core id		: 0
+cpu cores	: 4
+apicid		: 4
+
+processor	: 5
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 1
+siblings	: 4
+core id		: 1
+cpu cores	: 4
+apicid		: 5
+
+processor	: 6
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 1
+siblings	: 4
+core id		: 2
+cpu cores	: 4
+apicid		: 6
+
+processor	: 7
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping	: 7
+microcode	: 0x5002f00
+cpu MHz		: 2294.609
+cache size	: 22528 KB
+physical id	: 1
+siblings	: 4
+core id		: 3
+cpu cores	: 4
+apicid		: 7
+initial apicid	: 7
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon nopl xtopology tsc_reliable nonstop_tsc eagerfpu pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 invpcid avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 arat pku ospke avx512_vnni spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips	: 4589.21
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 45 bits physical, 48 bits virtual
+power management:
+
+```
