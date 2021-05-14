@@ -63,18 +63,46 @@ Swap:             0           0           0
 总调用量 700w - 1kw
 
 ### 吞吐量
-   - 190：
-       - 运行时长100分钟，GCT 107s = 98.25%
+   - 54 mesh_20：
+       - （早上11点到下午两点三十，业务高峰在早上十点，下午五点左右）运行时长200分钟，GCT 29.226s ,YGCT = 26.742 吞吐量：`（200 * 60 - 29.226）/ (200 * 60) = 99.75%`
+``` 
+
+[user_00@VM_0_54_centos /home/log/credit.afp_fund_hub.api_center]$ ps aux |grep credit.afp_fund_hub.api_center
+user_00   8325 10.9 18.8 6505372 1507692 ?     Sl   11:11  22:58 java -Denv=PRO -Xms1024m -Xmx1024m -Xmn256m -server -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -verbosegc -XX:+PrintGCDetails -Xloggc:../log/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=50M -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
+user_00  12458  0.0  0.0 112708  1012 pts/0    R+   14:41   0:00 grep --color=auto credit.afp_fund_hub.api_center
+[user_00@VM_0_54_centos /home/log/credit.afp_fund_hub.api_center]$ jstat -gc 8325 5000
+ S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
+13312.0 13312.0  0.0   11925.2 235520.0 133850.0  786432.0   498445.5  165056.0 151785.3 18432.0 16421.7   1239   18.248   5      1.364   19.612
+13312.0 13312.0  0.0   11925.2 235520.0 230964.9  786432.0   498445.5  165056.0 151785.3 18432.0 16421.7   1239   18.248   5      1.364   19.612
 
 ```
-[user_00@VM-0-3-centos ~]$ jstat -gcutil 30151
-  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT
-  0.00  91.75  53.70  65.77  93.01  89.98   7391  101.083    16    6.142  107.225
-  
-[user_00@VM-121-190-centos ~]$ ps aux |grep 'api_center'
-user_00   9599  0.0  0.0 112812   976 pts/0    S+   19:48   0:00 grep --color=auto api_center
-user_00  30151 37.4 22.6 7116032 1815424 ?     Sl   15:31  96:01 java -Denv=PRO -server -Xms1024m -Xmx1024m -Xmn192m -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
+
+   - 3 mesh_0：早上十一点十一分到下午两点四十三分，运行时长210分钟， `（210 * 60 - 19.6) / (210 * 60) =  99.84%`
 ```
+[user_00@VM_0_3_centos /home/log/credit.afp_fund_hub.api_center]$ jstat -gc 12323 5000
+ S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
+16896.0 16896.0 14791.2  0.0   228352.0 200825.1  786432.0   702891.3  160704.0 148539.0 17664.0 15752.9   1212   26.972   6      2.484   29.456
+16896.0 16896.0  0.0   15530.5 228352.0 82648.4   786432.0   703728.9  160704.0 148539.0 17664.0 15752.9   1213   26.989   6      2.484   29.474
+[user_00@VM_0_3_centos /home/log/credit.afp_fund_hub.api_center]$ ps -ef |grep credit.afp_fund_hub.api_center
+user_00  12323     1 10 11:11 ?        00:20:23 java -Denv=PRO -Xms1024m -Xmx1024m -Xmn256m -server -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -verbosegc -XX:+PrintGCDetails -Xloggc:../log/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=50M -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
+user_00  21678 19186  0 14:28 pts/0    00:00:00 grep --color=auto credit.afp_fund_hub.api_center
+``` 
+- 186  mesh_100
+- 运行时长 3 * 60 + 50 = 230 `（230 * 60 - 70) / (230 * 60) =  99.5%`
+
+``` 
+[user_00@VM_0_6_centos ~]$ jstat -gc 12207 5s
+ S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
+12800.0 11776.0  0.0   11692.9 237568.0 128910.1  786432.0   752471.1  157376.0 146318.4 17408.0 15680.9   4373   66.881   9      3.719   70.600
+12288.0 12800.0  0.0   10754.4 236544.0 33038.2   786432.0   753446.0  157376.0 146320.9 17408.0 15680.9   4375   66.909   9      3.719   70.629
+12800.0 12800.0  0.0   11105.9 236544.0 92238.2   786432.0   754368.2  157376.0 146320.9 17408.0 15680.9   4377   66.970   9      3.719   70.689
+12288.0 12288.0  0.0   10333.8 237056.0 86103.6   786432.0   756490.0  157376.0 146320.9 17408.0 15680.9   4379   67.002   9      3.719   70.721
+12288.0 12288.0 10431.2  0.0   237568.0 202970.8  786432.0   757170.8  157376.0 146320.9 17408.0 15680.9   4380   67.016   9      3.719   70.735
+^C[user_00@VM_0_6_centos ~]$ ps -aux |grep 12207
+user_00   5108  0.0  0.0 112812   972 pts/0    S+   14:56   0:00 grep --color=auto 12207
+user_00  12207 29.2 21.0 7072564 1689764 ?     Sl   11:07  66:50 java -Denv=PRO -Xms1024m -Xmx1024m -Xmn256m -server -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -verbosegc -XX:+PrintGCDetails -Xloggc:../log/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=50M -jar bin/credit.afp_fund_hub.api_center.jar --spring.profiles.active=pro
+```
+
 ### 机器CPU
 - prod 一个CPU （physical id）四核（cpu cores）四线程（processor）
 删除部分多余信息，最后一个保留
