@@ -266,3 +266,39 @@ worker 类继承了 AQS
 ## reactor
 与线程池不同的是每一个队列都有一个任务队列，并且不是阻塞的。
 reactor 中的线程有两种定义一种处理IO事件。
+
+## 四种常用线程池
+### newCachedThreadPool
+创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程。  使用 SynchronousQueue 做阻塞队列。
+``` java
+public static ExecutorService newCachedThreadPool() {  
+    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,  
+  60L, TimeUnit.SECONDS,  
+ new SynchronousQueue<Runnable>());  
+}
+
+```
+初始核心线程为0，线程添加到阻塞队列中
+
+### newFixedThreadPool
+创建一个定长线程池，可控制线程最大并发数，超出的线程会在队列中等待。  使用 LinkedBlockingQueue 做阻塞队列，当任务耗时较长时可能会导致大量新任务在队列中堆积最终导致OOM。
+
+
+### newScheduledThreadPool  
+创建一个定长线程池，支持定时及周期性任务执行。  
+``` java
+public ScheduledThreadPoolExecutor(int corePoolSize) {  
+    super(corePoolSize, Integer.MAX_VALUE, 0, NANOSECONDS,  
+ new DelayedWorkQueue());  
+}
+
+```
+
+### newSingleThreadExecutor
+创建一个单线程化的线程池，它只会用唯一的工作线程来执行任务，保证所有任务按照指定顺序(FIFO, LIFO, 优先级)执行。
+
+
+
+### handler 
+终止，抛弃，抛弃最旧，调用者运行。
+

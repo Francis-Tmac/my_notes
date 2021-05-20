@@ -150,4 +150,4 @@ address                        ZIPLIST_ENTRY_TAIL
 
 
 
-
+#### 连锁更新可能会带来多个节点的空间重分配操作。

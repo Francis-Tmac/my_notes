@@ -57,4 +57,12 @@ static final class Node {
 
 
 ReentrantLock 实现可重入锁，对state 的期望值是0时会获取锁，每次对state加一
-Semaphore 作为互斥锁是没有实现可重入锁，对 state 的期望大于0时获取锁，每次对state 减1
+Semaphore 作为互斥锁是没有实现可重入锁，对 state 的期望大于0时获取锁，每次对state 减1。
+
+### ReentrantLock 和 Sychronized 使用场景
+- ReentrantLock 中有公平锁的实现，Sychronized 中进入waitSet后每次获取锁都是随机的
+- ReentrantLock 中可以有多个等待队列，灵活调用。Sychronized只有一个 waitSet 而且每次获取锁的都是随机。
+- ReentrantLock 有超时机制等待可中断，获取不到锁会释放线程资源，当大量的线程使用 Sychronized 获取不到线程阻塞后，对线程资源的压力很大。
+
+- ReentrantLock 更大可能造成死锁，当获取锁后没释放锁造成了死锁， Sychronized 在执行完代码块后就隐式的释放对象锁。
+- Sychronized 与生俱来的锁对象头的，不会产生多余的线程。ReentrantLock 显示创建锁，当系统中有成百上千个 ReentrantLock 时对内存的资源消耗是不可忽视的。

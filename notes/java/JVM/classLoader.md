@@ -284,8 +284,24 @@ public class com/frank/multihread/thread/ActiveLoadTest {
 - 运行时包是有类加载器的命名空间和类的全限定名称共同组成的。
 - `VM options: -verbose:class` 打印加载的class 
 
+### 双亲委派模型
+
+委托机制：
+- 当前线程的类加载器加载线程中的第一个类，可以通过线程的上下文类加载器加载类（当前线程的类加载器可以通过Thread类的getContextClassLoader()获得，也可以通过setContextClassLoader()自己设置类加载器。）
+- A类中引用了B类，将使用A类的加载器加载B类
+- 直接调用 ClassLoader.loadClass 方法来指定某个类的加载器
+
+破坏双亲委派模型：
+- 使用线程上下文类加载器加载类
+
+意义：
+- 一个类只会被加载一次，虚拟机中只会存在一份字节码，一个class 对象。
+- 防止基类被篡改
+
+
 ## 线程上下文类加载器
 为什么要有线程上下文加载器呢？这与JVM类加载器双亲委托机制自身的缺陷分不开。
+
 
 
 
