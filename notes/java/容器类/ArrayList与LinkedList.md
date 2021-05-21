@@ -23,6 +23,8 @@ public class ArrayList<E> extends AbstractList<E>
 transient Object[] elementData;
 
 ```
+transient： 不被序列化。密码，银行卡等信息防止泄露，只允许存在内存中。
+
 ArrayList 中的关键字段 elementData 使用了 transient 关键字修饰，这个关键字的作用是，让它修饰的字段不被序列化；
 
 ArrayList 内部提供了两个私有方法 writeObject 和 readObject 来完成序列化和反序列化。
