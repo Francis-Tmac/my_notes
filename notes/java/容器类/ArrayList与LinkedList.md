@@ -97,3 +97,7 @@ LinkedList
 
 LinkedList 使用 for 循环遍历时效率极低，因为每一个get 操作都需要又遍历一次半个链表。
 而用 foreach 或迭代器遍历是使用 链表元素的 next 指针遍历。
+
+LinkedBlockingQueue 和 LinkedList
+LinkedBlockingQueue 单向列表实现BlockingQueue 接口
+LinkedList 双向列表实现 List Deque 接口。

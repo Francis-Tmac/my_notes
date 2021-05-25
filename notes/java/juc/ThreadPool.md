@@ -282,9 +282,9 @@ public static ExecutorService newCachedThreadPool() {
 
 ### newFixedThreadPool
 创建一个定长线程池，可控制线程最大并发数，超出的线程会在队列中等待。  使用 LinkedBlockingQueue 做阻塞队列，当任务耗时较长时可能会导致大量新任务在队列中堆积最终导致OOM。
+newScheduledThreadPool
 
-
-### newScheduledThreadPool  
+###   
 创建一个定长线程池，支持定时及周期性任务执行。  
 ``` java
 public ScheduledThreadPoolExecutor(int corePoolSize) {  
@@ -300,5 +300,5 @@ public ScheduledThreadPoolExecutor(int corePoolSize) {
 
 
 ### handler 
-终止，抛弃，抛弃最旧，调用者运行。
+抛出异常，抛弃，抛弃最旧，调用者运行。
 
