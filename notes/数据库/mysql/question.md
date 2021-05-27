@@ -45,3 +45,14 @@ db 隔离机制  MVCC 聚簇索引  间隙锁  next-key-locks 这些锁怎么产
 关于group by查不到数据的时候不会返回，需要在外层在包一层left/inner join，并使用ifnull(num,0)来做为空判断
 
 12. mysql和redis区别？
+
+mysql   a 是主键，c 是二级索引， select *  from xx where c = 1 走的是那个索引，一条数据也是走c 索引吗，这个边界值怎么确定
+
+MySQL 从自增列作为主键索引的好处。
+
+- 一条更新语句的执行流程：
+    - 
+一条查询语句的执行流程
+
+
+什么时候用事务：需要同时更新多张表，并且保证同时更新成功时使用事务

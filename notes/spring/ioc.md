@@ -199,3 +199,36 @@ spring中的IOC 容器用来存储所有的bean 对象，它管理了这些bean�
 spring 在讲类初始化为一个bean 对象的过程中，需要先将原对象的信息装换为一个 beanDefinition ,完成了整个beanDefinition的解析和加载过程后。
 通过beanDefinition 的信息用反射方式对bean进行创建操作，
 
+- 循环依赖
+
+什么时候进行提前AOP ？当AService 出现了循环依赖的时候
+如何检测有循环依赖
+
+AService 的Bean 生命周期
+0. creatingSet.add(`aService`)
+1. class-》实例化得到aService 原始对象，
+2. 给bService 属性赋值-》从单例池找----》找不到----》创建 BService 的 Bean 这里
+
+    BService 的bean 生命周期
+    2.1 class ---->实例化BService对象,中<beanName, BService原始对象>
+    2.2 给aService 属性赋值，从单例池找----》找不到----》creatingSet----->出现循环依赖-----》提前进行AOP（拿到原始对象才能进行AOP）-----》AService代理对象
+    2.3 给其他属性赋值
+    2.4 aop 
+    2.5 将对象放入单例池
+
+3. 给其他属性赋值
+4. aop（判断是否已经进行 AOP）
+5. 将对象放入单例池
+
+1. 多个循环依赖
+
+
+map<beanName, lambda(beanName,BeanDefinition,AService原始对象)
+
+
+
+
+
+
+
+
