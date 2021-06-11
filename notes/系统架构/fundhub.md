@@ -53,15 +53,6 @@ dubbo : 嵌入到服务中
 2. 提供基于注解的分布式锁
 3. 提供基于注解的 服务调用方式
 
-next key lock 产生规则
-
-说说Guava cache的实现思路，清除策略是怎么实现的
-  灵感来源于ConcurrentHashMap，支持缓存清除算法和多种引用类型、使用两个队列来实现LRU清楚策略
-
-
-Arrays.asList Assays.subList
-
-
 
 还款试算的场景，上游提前对正常还款批任务处理的场景进行试算缓存，大量的瞬时流量请求到系统中。
 1. 优化点上游提前对批扣场景进行分片处理
@@ -127,3 +118,11 @@ Arrays.asList Assays.subList
     Long code = this.runLua(LUA_SCRIPT, Long.class, keys, Long.toString(lowestRequestCount), reqId, Long.toString(System.currentTimeMillis() / 1000));
 
 ```
+
+next key lock 产生规则
+
+说说Guava cache的实现思路，清除策略是怎么实现的
+  灵感来源于ConcurrentHashMap，支持缓存清除算法和多种引用类型、使用两个队列来实现LRU清楚策略
+
+
+Arrays.asList Assays.subList
