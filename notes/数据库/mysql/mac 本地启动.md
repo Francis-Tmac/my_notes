@@ -1,0 +1,3 @@
+- step1: 系统偏好设置stop 正在运行的MySQL
+- step2: frank  /usr/local/Cellar/mysql@5.7/5.7.29/bin  mysql.server start
+- step3: 登录 MySQL -u 
