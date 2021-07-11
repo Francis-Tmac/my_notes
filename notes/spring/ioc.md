@@ -172,8 +172,8 @@ getSingleton -----> beforeSingletonCreation
 2. 调用bean 工厂后置处理器完成扫描
 3. 循环解析扫描出来的类信息
 4. 实例化一个BeanDefinition 对象存储解析出来的信息
-5. 实例化好的 beanDefinition 对象put 到 beanDefinitionMap 中存储起来，以便后面实例化bean
-6. 再次调用bean 工厂后置处理器
+5. 实例化好的 beanDefinition 对象 put 到 beanDefinitionMap 中存储起来，以便后面实例化bean
+6. 再次调用 bean 工厂后置处理器
 7. 国际化等操作，实例化一个bean 重要的是调用 finishBeanFactoryInitialization 方法来实例化单例的bean ，实例化之前spring要做验证，需要遍历所有扫描出来的类，
             一次判断这个bean 是否 lazy，是否 protoType，是否 abstract等等。
 8. 如果验证完成spring 在实例化一个bean 之前 需要推断构造方法，因为spring 实例化对象是通过构造方法反射，故需要知道用的哪个构造方法。
