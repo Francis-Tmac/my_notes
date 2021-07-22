@@ -62,8 +62,139 @@ static final class Node {
 #### 非公平锁
 1. lock -> 尝试修改state 状态
 2. acquire -> tryAcquire 尝试修改state 状态，并且做可重入锁判断
-3. 添加到队列前，如果前节点是头节点也会尝试修改 state 状态。
+3. 添加到队列后，如果前节点是头节点也会尝试修改 state 状态。
  
+获取锁的方法 `ReentrantLock#lock()` `ReentrantLock#tryLock()`
+##### ReentrantLock#lock()
+ReentrantLock#lock() ---> Sync#lock() ---> NonfairSync#lock() 
+
+##### ReentrantLock#tryLock()
+只有一次尝试获取锁失败则返回，没有进入同步队列
+ReentrantLock#lock() ---> Sync#nonfairTryAcquire()
+```java
+    static final class NonfairSync extends Sync {
+        private static final long serialVersionUID = 7316153563782823691L;
+
+        /**
+         * Performs lock.  Try immediate barge, backing up to normal
+         * acquire on failure.
+         */
+        final void lock() {
+            // 第一次尝试获取锁
+            if (compareAndSetState(0, 1))
+                setExclusiveOwnerThread(Thread.currentThread());
+            else
+                // 获取锁失败后调用 acquire 方法
+                acquire(1);
+        }
+        // AbstractQueuedSynchronizer#acquire() 为抽象方法将调用子类实现的 tryAcquire()方法
+        protected final boolean tryAcquire(int acquires) {
+            // 调用的 nonfairTryAcquire 方法为
+            return nonfairTryAcquire(acquires);
+        }
+    }
+```
+- Sync
+```java
+    abstract static class Sync extends AbstractQueuedSynchronizer {
+        private static final long serialVersionUID = -5179523762034025860L;
+
+        /**
+         * Performs {@link Lock#lock}. The main reason for subclassing
+         * is to allow fast path for nonfair version.
+         */
+        abstract void lock();
+
+        /**
+         * Performs non-fair tryLock.  tryAcquire is implemented in
+         * subclasses, but both need nonfair try for trylock method.
+         */
+        final boolean nonfairTryAcquire(int acquires) {
+            final Thread current = Thread.currentThread();
+            int c = getState();
+            if (c == 0) {
+                // 尝试获取锁
+                if (compareAndSetState(0, acquires)) {
+                    setExclusiveOwnerThread(current);
+                    return true;
+                }
+            }
+            else if (current == getExclusiveOwnerThread()) {
+                int nextc = c + acquires;
+                if (nextc < 0) // overflow
+                    throw new Error("Maximum lock count exceeded");
+                setState(nextc);
+                return true;
+            }
+            return false;
+        }
+
+        protected final boolean tryRelease(int releases) {
+            int c = getState() - releases;
+            if (Thread.currentThread() != getExclusiveOwnerThread())
+                throw new IllegalMonitorStateException();
+            boolean free = false;
+            if (c == 0) {
+                free = true;
+                setExclusiveOwnerThread(null);
+            }
+            setState(c);
+            return free;
+        }
+    }
+```
+
+- acquire()
+```java
+    public abstract class AbstractQueuedSynchronizer
+        extends AbstractOwnableSynchronizer
+        implements java.io.Serializable {
+
+            public final void acquire(int arg) {
+                // tryAcquire 会调用到 Sync#nonfairTryAcquire() 尝试获取锁
+                // addWaiter(Node.EXCLUSIVE) 将线程加入到同步队列中
+                // 加入后会判断 前驱节点是否为头结点，若是则再次尝试获取锁
+
+                if (!tryAcquire(arg) &&
+                    acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+                    selfInterrupt();
+            }
+            
+            final boolean acquireQueued(final Node node, int arg) {
+                boolean failed = true;
+                try {
+                    boolean interrupted = false;
+                    // 进入自旋
+                    for (;;) {
+                        final Node p = node.predecessor();
+                        // 再次判断后尝试获取锁
+                        if (p == head && tryAcquire(arg)) {
+                            setHead(node);
+                            p.next = null; // help GC
+                            failed = false;
+                            return interrupted;
+                        }
+                        // 如果前驱结点不是head，判断是否挂起线程
+                        // 
+                        // parkAndCheckInterrupt() 将当前线程挂起
+                        if (shouldParkAfterFailedAcquire(p, node) &&
+                            parkAndCheckInterrupt())
+                            interrupted = true;
+                    }
+                } finally {
+                    if (failed)
+                        cancelAcquire(node);
+                }
+            }
+
+
+        }
+```
+
+shouldParkAfterFailedAcquire() 方法的作用是判断当前结点的前驱结点是否为SIGNAL状态(即等待唤醒状态)，如果是则返回true。
+如果结点的ws为CANCELLED状态(值为1>0),即结束状态，则说明该前驱结点已没有用应该从同步队列移除，执行while循环，
+直到寻找到非CANCELLED状态的结点。倘若前驱结点的ws值不为CANCELLED，也不为SIGNAL(当从Condition的条件等待队列转移到同步队列时，
+结点状态为CONDITION因此需要转换为SIGNAL)，那么将其转换为SIGNAL状态，等待被唤醒。
 
 #### 公平锁
 1. 如果队列为空，会尝试修改state 状态。再做重入锁判断
