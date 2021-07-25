@@ -1,0 +1,7 @@
+   IdentityFile /home/m_frank.yang/.ssh/public_id_rsa
+Host 11.11
+   User user_00
+   HostName 10.80.11.11
+   Port 36000
+   IdentityFile /home/m_xx.yy/.ssh/public_id_rsa
+
